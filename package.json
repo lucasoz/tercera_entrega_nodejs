@@ -1,0 +1,34 @@
+{
+  "name": "tercera_entrega",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/lucasoz/tercera_entrega_nodejs.git"
+  },
+  "author": "Lucas Esteban Muñoz Montes",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/lucasoz/tercera_entrega_nodejs/issues"
+  },
+  "homepage": "https://github.com/lucasoz/tercera_entrega_nodejs#readme",
+  "devDependencies": {
+    "babel-preset-env": "^1.7.0",
+    "babel-register": "^6.26.0"
+  },
+  "dependencies": {
+    "bcrypt": "^3.0.5",
+    "body-parser": "^1.18.3",
+    "express": "^4.16.4",
+    "express-session": "^1.15.6",
+    "hbs": "^4.0.3",
+    "memorystore": "^1.6.1",
+    "mongoose": "^5.4.22",
+    "mongoose-unique-validator": "^2.0.2",
+    "nodemon": "^1.18.10"
+  }
+}

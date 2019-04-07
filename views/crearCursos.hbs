@@ -1,0 +1,69 @@
+{{>header}}
+
+{{#if hayerror}}
+    {{#if error}}
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        <strong>Espera!</strong> {{error}}
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+        </button>
+        </div>
+    {{/if}}
+{{else}}
+    {{#if error}}
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+    <strong>Excelente!</strong> {{error}}
+    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+    </button>
+    </div>
+    {{/if}}
+{{/if}}
+<form action="/crear-cursos" method="POST" class="ml-5 mr-5 text-center">
+    <div class="container">
+        <div class="row">
+            <div class="col">
+                <div class="form-group ">
+                    <input type="text" class="form-control" name="nombre" required placeholder="Nombre" value={{curso.nombre}}>
+                </div>
+            </div>
+        
+        </div>
+        <div class="row">
+            <div class="col">
+                <div class="form-group">
+                    <input type="text" class="form-control" required name="descripcion" placeholder="Descripción" value={{curso.descripcion}}>
+                </div>
+            </div>
+            <div class="col">
+                <div class="form-group">
+                    <input type="number" class="form-control" required name="valor" placeholder="Valor" value={{curso.valor}}>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col">
+                <div class="form-group">
+                    <select name="modalidad" class="custom-select" value={{curso.modalidad}}>
+                        <option value="" disabled selected>Seleccione una modalidad</option>           
+                        <option value="presencial">Presencial</option>
+                        <option value="virtual">Virtual</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="col">
+                <div class="form-group">
+                    <input type="number" class="form-control" name="intensidad" placeholder="Intensidad horaria" value={{curso.intensidad}}>
+                </div>
+            </div>
+        </div>
+    </div>
+        
+    
+    
+    <button class="btn btn-primary">Crear</button>
+</form>
+
+{{>footer}}
+

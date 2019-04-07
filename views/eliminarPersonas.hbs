@@ -1,0 +1,55 @@
+{{>header}}
+
+<div class="accordion" id="accordionExample">
+    {{#each cursos as |curso|}}
+        <div class="card">
+            <div class="card-header text-center" id="heading-{{curso.id}}">
+            <h2 class="mb-0">
+                <button class="btn btn-link collapsed" type="button" data-toggle="collapse" data-target="#collapse-{{curso.id}}" aria-expanded="false" aria-controls="collapseTwo">
+                    <strong>Nombre: </strong> {{curso.nombre}} <br>
+                    <strong>Descripción: </strong> {{curso.descripcion}} <br>
+                    <strong>Valor: </strong> {{curso.valor}} 
+                </button>
+            </h2>
+            </div>
+            <div id="collapse-{{curso.id}}" class="collapse" aria-labelledby="headingTwo" data-parent="#accordionExample">
+            <div class="card-body">
+                <table class="table table-sm">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Documento</th>
+                            <th>Nombre</th>
+                            <th>Correo</th>
+                            <th>Teléfono</th>
+                            <th>Opciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {{#each curso.inscritos as |inscrito|}}
+                            <tr>
+                                <th>{{@index}}</th>
+                                <th>{{inscrito.documento}}</th>
+                                <th>{{inscrito.nombre}}</th>
+                                <th>{{inscrito.correo}}</th>
+                                <th>{{inscrito.telefono}}</th>
+                                <th><div class="text-center">
+                                    <a class="btn btn-danger" role="button" href="/eliminar-personas?idCurso={{curso.id}}&idAsp={{inscrito.documento}}">Eliminar</a>
+                                </form></th>
+                            </tr>
+                        {{else}}
+                            <h2>No hay aspirantes inscritos
+                            </h2>
+                        {{/each}}
+                        
+                    </tbody>
+                </table>
+            </div>
+            </div>
+        </div>
+    {{else}}
+        <h2>No hay cursos disponibles</h2>
+    {{/each}}
+</div>
+
+{{>footer}}
