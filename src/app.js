@@ -131,7 +131,6 @@ app.post('/login', (req, res) => {
         req.session.usuario = respuesta._id
         req.session.tipo = respuesta.tipo
         req.session.nombre = respuesta.nombre
-        console.log(req.session);
         
         res.render('index', {
             funcion: 'Página principal',
