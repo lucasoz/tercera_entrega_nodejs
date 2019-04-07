@@ -11,6 +11,7 @@ import bcrypt from 'bcrypt'
 import session from 'express-session'
 import memoryStore from 'memorystore'
 import _ from 'lodash'
+require('./config/config')
 
 const memorystore = memoryStore(session)
 
@@ -19,7 +20,7 @@ const app = express()
 const dirPublic = path.join(__dirname, '../public')
 const directoriopartials = path.join(__dirname,'../partials')
 
-mongoose.connect('mongodb://localhost:27017/sistema_academico', {useNewUrlParser: true}, (err, resultado) => {
+mongoose.connect(process.env.URLDB, {useNewUrlParser: true}, (err, resultado) => {
 	if (err) {
 		return console.log(err)
 	}
@@ -363,6 +364,6 @@ app.get('*', (req, res) => {
 })
 
 
-app.listen(3000, () => {
-    console.log('Escuchando en el puerto 3000')
+app.listen(process.env.PORT, () => {
+    console.log('Escuchando en el puerto '+ process.env.PORT)
 })
