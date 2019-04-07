@@ -51,6 +51,14 @@ app.get('/', (req, res) => {
 // rutas todos
 
 app.get('/registro', (req, res) => {
+    if(req.session.usuario){
+        return res.render('error', {
+            estudiante: 'error',
+            funcion: 'Error',
+            mensaje: 'Tienes una sesión iniciada',
+            permisos: funciones.funcionalidades(req.session.tipo)
+        })
+    }
     res.render('registro', {
         funcion : "Registrarse", 
         permisos: funciones.funcionalidades(req.session.tipo)
@@ -58,7 +66,6 @@ app.get('/registro', (req, res) => {
 })
 
 app.post('/registro', (req, res) => {
-    console.log(req.body);
     let usuario = new Usuario({
         documento: req.body.documento,
         nombre: req.body.nombre,
@@ -79,11 +86,20 @@ app.post('/registro', (req, res) => {
                 permisos: funciones.funcionalidades(req.session.tipo)
 			})
 		}
-		res.redirect('/listar-cursos')
+		res.redirect('/login')
 	})
 })
 
 app.get('/login', (req, res) => {
+    console.log(req.session.usuario)
+    if(req.session.usuario){
+        return res.render('error', {
+            estudiante: 'error',
+            funcion: 'Error',
+            mensaje: 'Ya tienes una sesión iniciada',
+            permisos: funciones.funcionalidades(req.session.tipo)
+        })
+    }
     res.render('login', {
         funcion : "Iniciar sesión", 
         permisos: funciones.funcionalidades(req.session.tipo)
@@ -129,6 +145,14 @@ app.post('/login', (req, res) => {
 // rutas coordinador
 
 app.get('/crear-cursos', (req, res) => {
+    if(req.session.tipo !== 'coordinador'){
+        return res.render('error', {
+            estudiante: 'error',
+            funcion: 'Error',
+            mensaje: 'No tienes privilegios para ingresar a esta funcionalidad',
+            permisos: funciones.funcionalidades(req.session.tipo)
+        })
+    }
     res.render('crearCursos', {
         funcion : "Crear un curso", 
         permisos: funciones.funcionalidades(req.session.tipo)
@@ -160,7 +184,36 @@ app.post('/crear-cursos', (req, res) => {
 
 })
 
+app.get('/listar-cursos-cerrados',(req, res) => {
+    if(req.session.tipo !== 'coordinador'){
+        return res.render('error', {
+            estudiante: 'error',
+            funcion: 'Error',
+            mensaje: 'No tienes privilegios para ingresar a esta funcionalidad',
+            permisos: funciones.funcionalidades(req.session.tipo)
+        })
+    }
+    Curso.find({estado: 'no disponible'}).exec((err, respuesta) => {
+        if (err) {
+			return console.log('err')
+		}
+		res.render('listarCursos', {
+            funcion : "Lista de cursos cerrados", 
+            cursos: respuesta,
+            permisos: funciones.funcionalidades(req.session.tipo)
+        })
+    })
+})
+
 app.get('/ver-inscritos', (req, res) => {
+    if(req.session.tipo !== 'coordinador'){
+        return res.render('error', {
+            estudiante: 'error',
+            funcion: 'Error',
+            mensaje: 'No tienes privilegios para ingresar a esta funcionalidad',
+            permisos: funciones.funcionalidades(req.session.tipo)
+        })
+    }
     const id = req.query.id
     Curso.findOneAndUpdate({_id: id}, {estado: 'no disponible'}, (err, respuesta) => {
         if(err){
@@ -184,6 +237,14 @@ app.get('/ver-inscritos', (req, res) => {
 
 
 app.get('/eliminar-personas',(req, res) => {
+    if(req.session.tipo !== 'coordinador'){
+        return res.render('error', {
+            estudiante: 'error',
+            funcion: 'Error',
+            mensaje: 'No tienes privilegios para ingresar a esta funcionalidad',
+            permisos: funciones.funcionalidades(req.session.tipo)
+        })
+    }
     const idCurso = req.query.idCurso
     const idAsp = req.query.idAsp
     Curso.findByIdAndUpdate(idCurso, {$pull : {inscritos : idAsp}}, (err, respuesta) => {
@@ -200,7 +261,6 @@ app.get('/eliminar-personas',(req, res) => {
                 }
                 let mensaje = ''
                 resultado && respuesta && (mensaje = "Aspirante eliminado con éxito")
-
                 return res.render('eliminarPersonas', {
                     funcion : "Eliminar personas", 
                     cursos: cursos,
@@ -215,6 +275,14 @@ app.get('/eliminar-personas',(req, res) => {
 
 // rutas aspirantes
 app.get('/inscribirme',(req, res) => {
+    if(req.session.tipo !== 'aspirante'){
+        return res.render('error', {
+            estudiante: 'error',
+            funcion: 'Error',
+            mensaje: 'No tienes privilegios para ingresar a esta funcionalidad',
+            permisos: funciones.funcionalidades(req.session.tipo)
+        })
+    }
     const id = req.session.usuario
     if(!id){
        return res.redirect('/login') 
@@ -279,10 +347,18 @@ app.get('/listar-cursos',(req, res) => {
     })
 })
 
+app.get('/salir',(req, res) => {
+    req.session.usuario = null
+    req.session.tipo = null
+    req.session.nombre = null
+    res.redirect('/')
+})
+
 app.get('*', (req, res) => {
     res.render('error', {
         estudiante: 'error',
         funcion: 'Error',
+        mensaje: 'Página no encontrada',
         permisos: funciones.funcionalidades(req.session.tipo)
     })
 })

@@ -39,7 +39,7 @@ const usuarioSchema = new Schema({
         ref: 'Curso',
     }]
 })
-usuarioSchema.plugin(uniqueValidator, { message: 'Error, {PATH} no se pede repetir.'});
+usuarioSchema.plugin(uniqueValidator, { message: 'Error, el campo {PATH} ya ha sido tomado.'});
 
 const Usuario = mongoose.model('Usuario', usuarioSchema)
 module.exports = Usuario

@@ -7,11 +7,11 @@ let listaAspirantes = []
 
 const funcionalidades = (tipo) => {
     if(tipo === 'aspirante'){
-        return {aspirante: true}
+        return {aspirante: true, salir: true}
     }else if (tipo === 'coordinador') {
-        return {coordinador: true}
+        return {coordinador: true, salir: true}
     }else {
-        return {interesado: true}
+        return {interesado: true, login_registro: true}
     }
 }
 

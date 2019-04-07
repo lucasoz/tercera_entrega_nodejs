@@ -12,7 +12,7 @@
   </head>
 <body>
 <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-  <a class="navbar-brand" href="/">Sistema académico</a>
+  <a class="navbar-brand ml-5" href="/">Sistema académico</a>
   <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
     <span class="navbar-toggler-icon"></span>
   </button>
@@ -27,6 +27,8 @@
           <a class="dropdown-item" href="/crear-cursos">Crear un curso</a>
           <a class="dropdown-item" href="/ver-inscritos">Ver inscritos</a>
           <a class="dropdown-item" href="/eliminar-personas">Eliminar personas</a>
+          <a class="dropdown-item" href="/listar-cursos">Listar cursos disponibles</a>
+          <a class="dropdown-item" href="/listar-cursos-cerrados">Listar cursos cerrados</a>
         </div>
       </li>
     </ul>
@@ -66,8 +68,20 @@
     </ul>
    
   </div>
-
   {{/if}}
+
+  {{#if permisos.login_registro}}
+  <div class="my-2 my-lg-0">
+    <a class="btn btn-outline-success my-2 my-sm-0" href="/login">Ingresar</a>
+    <a class="btn btn-outline-info my-2 my-sm-0 ml-4 mr-5" href="/registro">Registro</a>
+  </div>
+  {{/if}} 
+  
+  {{#if permisos.salir}}
+  <div class="my-2 my-lg-0">
+    <a class="btn btn-outline-danger my-2 my-sm-0 mr-5" href="/salir">Salir</a>
+  </div>
+  {{/if}}  
 </nav>
 
 
