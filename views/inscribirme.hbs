@@ -23,30 +23,7 @@
 
 <form action="/inscribirme" method="POST" class="ml-5 mr-5">
     <div class="container">
-        <div class="row">
-            <div class="col">
-                <div class="form-group">
-                    <input type="number" class="form-control" required name="documento" placeholder="Documento de indentidad" value={{asp.documento}}>
-                </div>
-            </div>
-            <div class="col">
-                <div class="form-group ">
-                    <input type="text" class="form-control" name="nombre" required placeholder="Nombre" value={{asp.nombre}}>
-                </div>
-            </div>
-        </div>
-        <div class="row">
-            <div class="col">
-                <div class="form-group">
-                    <input type="email" class="form-control" required name="correo" placeholder="Correo electrónico" value={{asp.correo}}>
-                </div>
-            </div>
-            <div class="col">
-                <div class="form-group">
-                    <input type="number" class="form-control" required name="telefono" placeholder="Teléfono" value={{asp.telefono}}>
-                </div>
-            </div>
-        </div>
+        <h2>Seleecione el curso al que desea inscribirse</h2>
         <div class="row">
             <div class="col">
                 <div class="form-group">
@@ -61,12 +38,6 @@
         </div>
         <button class="btn btn-primary">Inscribir</button>
     </div>
-    
-    
-    
-    
-    
-    
 </form>
 
 {{>footer}}

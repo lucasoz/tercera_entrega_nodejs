@@ -25,7 +25,7 @@ const cursoSchema = new Schema({
     },
     inscritos: [{
         type: mongoose.Schema.Types.ObjectId,
-        ref: 'Usuario'
+        ref: 'Usuario',
     }],
     estado: {
         type: String,

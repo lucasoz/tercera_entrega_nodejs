@@ -3,6 +3,7 @@ const Schema = mongoose.Schema;
 var uniqueValidator = require('mongoose-unique-validator');
 
 const usuarioSchema = new Schema({
+
     documento:{
         type: Number,
         required: true,
@@ -35,7 +36,7 @@ const usuarioSchema = new Schema({
     },
     cursos: [{
         type: mongoose.Schema.Types.ObjectId,
-        ref: 'Curso'
+        ref: 'Curso',
     }]
 })
 usuarioSchema.plugin(uniqueValidator, { message: 'Error, {PATH} no se pede repetir.'});

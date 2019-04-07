@@ -4,6 +4,17 @@ import express from 'express';
 let listaCursos = []
 let listaAspirantes = []
 
+
+const funcionalidades = (tipo) => {
+    if(tipo === 'aspirante'){
+        return {aspirante: true}
+    }else if (tipo === 'coordinador') {
+        return {coordinador: true}
+    }else {
+        return {interesado: true}
+    }
+}
+
 const crearCurso = (curso) => {
     listarCursos()
     let cur = {
@@ -154,4 +165,5 @@ module.exports = {
     inscribirme,
     cambiarEstado,
     eliminarAspCur,
+    funcionalidades,
 }

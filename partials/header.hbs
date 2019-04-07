@@ -16,7 +16,7 @@
   <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
     <span class="navbar-toggler-icon"></span>
   </button>
-
+  {{#if permisos.coordinador}}
   <div class="collapse navbar-collapse" id="navbarSupportedContent">
     <ul class="navbar-nav mr-auto">
       <li class="nav-item dropdown">
@@ -30,8 +30,11 @@
         </div>
       </li>
     </ul>
-   
   </div>
+  {{/if}}
+
+
+  {{#if permisos.interesado}}
   <div class="collapse navbar-collapse" id="navbarSupportedContent">
     <ul class="navbar-nav mr-auto">
       <li class="nav-item dropdown">
@@ -45,6 +48,10 @@
     </ul>
    
   </div>
+  {{/if}}
+
+
+  {{#if permisos.aspirante}}
   <div class="collapse navbar-collapse" id="navbarSupportedContent">
     <ul class="navbar-nav mr-auto">
       <li class="nav-item dropdown">
@@ -53,11 +60,14 @@
         </a>
         <div class="dropdown-menu" aria-labelledby="navbarDropdown">
           <a class="dropdown-item" href="/inscribirme">Inscribirme en un curso</a>
+          <a class="dropdown-item" href="/listar-cursos">Listar cursos disponibles</a>
         </div>
       </li>
     </ul>
    
   </div>
+
+  {{/if}}
 </nav>
 
 

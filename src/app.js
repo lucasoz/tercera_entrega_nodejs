@@ -10,6 +10,7 @@ import Curso from './modelos/curso'
 import bcrypt from 'bcrypt'
 import session from 'express-session'
 import memoryStore from 'memorystore'
+import _ from 'lodash'
 
 const memorystore = memoryStore(session)
 
@@ -23,7 +24,6 @@ mongoose.connect('mongodb://localhost:27017/sistema_academico', {useNewUrlParser
 		return console.log(err)
 	}
 	console.log('conectado a mongodb');
-	
 });
 
 app.use(session({
@@ -31,7 +31,7 @@ app.use(session({
     store: new memorystore({
       checkPeriod: 86400000 // prune expired entries every 24h
     }),
-    secret: 'keyboard cat'
+    secret: '$ec4+p4ssw04d'
 }))
 
 app.use(express.static(dirPublic))
@@ -42,15 +42,18 @@ app.set('view engine', 'hbs')
 
 app.get('/', (req, res) => {
     res.render('index', {
-        funcion: 'Página principal'
+        funcion: 'Página principal',
+        nombre: req.session.nombre,
+        permisos: funciones.funcionalidades(req.session.tipo)
     })
 })
 
-// rutas coordinador
+// rutas todos
 
 app.get('/registro', (req, res) => {
     res.render('registro', {
         funcion : "Registrarse", 
+        permisos: funciones.funcionalidades(req.session.tipo)
     })
 })
 
@@ -65,12 +68,15 @@ app.post('/registro', (req, res) => {
     })
 
     usuario.save((err, resultado) => {
-		if(err){            
+		if(err){       
+            console.log(err);
+                 
             let error_message = err.errors.documento ? err.errors.documento.message : err.errors.correo ? err.errors.correo.message : ''
 		    return res.render('registro', {
                 funcion : "Registrarse", 
                 hayerror: true,		
                 error: error_message,
+                permisos: funciones.funcionalidades(req.session.tipo)
 			})
 		}
 		res.redirect('/listar-cursos')
@@ -80,6 +86,7 @@ app.post('/registro', (req, res) => {
 app.get('/login', (req, res) => {
     res.render('login', {
         funcion : "Iniciar sesión", 
+        permisos: funciones.funcionalidades(req.session.tipo)
     })
 })
 
@@ -91,6 +98,7 @@ app.post('/login', (req, res) => {
 
         if(!respuesta){
             return res.render('login', {
+                permisos: funciones.funcionalidades(req.session.tipo),
                 funcion : "Iniciar sesión", 
                 error: "Contraseña incorrecta"
             })
@@ -99,21 +107,31 @@ app.post('/login', (req, res) => {
         if(!bcrypt.compareSync(req.body.password, respuesta.password)){
             return res.render('login', {
                 funcion : "Iniciar sesión", 
-                error: "Contraseña incorrecta"
+                error: "Contraseña incorrecta",
+                permisos: funciones.funcionalidades(req.session.tipo)
             })
         }
 
         req.session.usuario = respuesta._id
+        req.session.tipo = respuesta.tipo
+        req.session.nombre = respuesta.nombre
         console.log(req.session);
         
-        res.redirect('/listar-cursos')
+        res.render('index', {
+            funcion: 'Página principal',
+            nombre: req.session.nombre,
+            permisos: funciones.funcionalidades(req.session.tipo)
+        })
 
     })
 })
 
+// rutas coordinador
+
 app.get('/crear-cursos', (req, res) => {
     res.render('crearCursos', {
         funcion : "Crear un curso", 
+        permisos: funciones.funcionalidades(req.session.tipo)
     })
 })
 
@@ -133,7 +151,8 @@ app.post('/crear-cursos', (req, res) => {
                 funcion : "Crear un curso", 
                 hayerror: true,		
                 error: error_message,
-                curso: curso
+                curso: curso,
+                permisos: funciones.funcionalidades(req.session.tipo)
 			})
 		}
 		res.redirect('/listar-cursos')
@@ -141,62 +160,108 @@ app.post('/crear-cursos', (req, res) => {
 
 })
 
-
 app.get('/ver-inscritos', (req, res) => {
     const id = req.query.id
-    let respuesta = ''
-    id && (respuesta = funciones.cambiarEstado(id))
-    const cursos = funciones.mostrarCursosDisponibles()
-    res.render('verInscritos', {
-        funcion : "Ver inscritos", 
-        cursos,
-        mensaje: respuesta
-    })
+    Curso.findOneAndUpdate({_id: id}, {estado: 'no disponible'}, (err, respuesta) => {
+        if(err){
+            return console.log(err)
+        }
+        let mensaje = ''
+        respuesta && (mensaje = 'Curso actualizado con éxito')
+        Curso.find({estado: 'disponible'}).populate('inscritos',{documento: 1, correo:1, nombre:1, telefono:1}).exec((err, cursos) => {
+            if (err) {
+                return console.log('err')
+            }
+            return res.render('verInscritos', {
+                funcion : "Ver inscritos", 
+                cursos: cursos,
+                mensaje: mensaje,
+                permisos: funciones.funcionalidades(req.session.tipo)
+            })
+        })
+    })    
 })
 
 
 app.get('/eliminar-personas',(req, res) => {
     const idCurso = req.query.idCurso
     const idAsp = req.query.idAsp
-    idCurso && idAsp && funciones.eliminarAspCur(idCurso,idAsp)    
-    const cursos = funciones.mostrarCursosDisponibles()
-    res.render('eliminarPersonas', {
-        funcion : "Eliminar personas", 
-        cursos
-    })
+    Curso.findByIdAndUpdate(idCurso, {$pull : {inscritos : idAsp}}, (err, respuesta) => {
+        if(err){
+            return console.log(err)
+        }
+        Usuario.findByIdAndUpdate(idAsp, {$pull : {cursos : idCurso}}, (err, resultado) => {
+            if(err){
+                return console.log(err)
+            }
+            Curso.find({estado: 'disponible'}).populate('inscritos',{documento: 1, correo:1, nombre:1, telefono:1}).exec((err, cursos) => {
+                if (err) {
+                    return console.log('err')
+                }
+                let mensaje = ''
+                resultado && respuesta && (mensaje = "Aspirante eliminado con éxito")
+
+                return res.render('eliminarPersonas', {
+                    funcion : "Eliminar personas", 
+                    cursos: cursos,
+                    mensaje,
+                    permisos: funciones.funcionalidades(req.session.tipo)
+                })
+            })
+        })
+
+    })    
 })
 
 // rutas aspirantes
 app.get('/inscribirme',(req, res) => {
-    Curso.find({estado: 'disponible'},{nombre: 1}).exec((err, respuesta) => {
-        if (err) {
-			return console.log('err')
+    const id = req.session.usuario
+    if(!id){
+       return res.redirect('/login') 
+    }
+    Usuario.findById(id, {cursos: 1}, (err, usuario) => {
+        if(err){
+            return console.log(err);
         }
-
-        
-		res.render('inscribirme', {
-            funcion : "Inscripción a un curso", 
-            cursos: respuesta
+        Curso.find(_.isEmpty(usuario.cursos) ? {estado: 'disponible'} : {$and : [{estado: 'disponible'}, {_id: {$nin: usuario.cursos}}]},{nombre: 1}).exec((err, respuesta) => {
+            if (err) {
+                return console.log(err)
+            }
+    
+            res.render('inscribirme', {
+                funcion : "Inscripción a un curso", 
+                cursos: respuesta,
+                permisos: funciones.funcionalidades(req.session.tipo)
+            })
         })
-    })
+    })   
 })
 
 
 app.post('/inscribirme',(req, res) => {
-    // console.log(req.body.curso)
-    // const respuesta = funciones.inscribirme(req.body)
-    // respuesta.error == 1 ? res.render('inscribirme', {
-    //     funcion : "Inscripción a un curso", 
-    //     error: respuesta.mensaje,
-    //     hayerror: respuesta.error == 1,
-    //     asp: respuesta.asp,
-    //     cursos: funciones.cursosId()
-    // }) : res.render('inscribirme', {
-    //     funcion : "Inscripción a un curso", 
-    //     hayerror: respuesta.error == 1,
-    //     error: respuesta.mensaje,
-    //     cursos: funciones.cursosId()
-    // })
+    const cursoId = req.body.curso
+    const userId = req.session.usuario
+    
+    Curso.findById(cursoId, (err, curso) => {
+        if (err) {
+            return console.log(err)
+        }
+        curso && Curso.updateOne({_id: cursoId}, {$push : {inscritos : userId}}, (err, respuesta) => {
+            if (err) {
+                return console.log(err)
+            }
+            Usuario.updateOne({_id: userId},{$push: {cursos: cursoId}},(err, resultado) => {
+                if (err) {
+                    return console.log(err)
+                }
+            })
+
+        })
+        res.redirect('/inscribirme')
+    })
+
+    
+
 })
 
 
@@ -208,7 +273,8 @@ app.get('/listar-cursos',(req, res) => {
 		}
 		res.render('listarCursos', {
             funcion : "Lista de cursos", 
-            cursos: respuesta
+            cursos: respuesta,
+            permisos: funciones.funcionalidades(req.session.tipo)
         })
     })
 })
@@ -216,9 +282,11 @@ app.get('/listar-cursos',(req, res) => {
 app.get('*', (req, res) => {
     res.render('error', {
         estudiante: 'error',
-        funcion: 'Error'
+        funcion: 'Error',
+        permisos: funciones.funcionalidades(req.session.tipo)
     })
 })
+
 
 app.listen(3000, () => {
     console.log('Escuchando en el puerto 3000')

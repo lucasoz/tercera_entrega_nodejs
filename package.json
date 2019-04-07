@@ -26,6 +26,7 @@
     "express": "^4.16.4",
     "express-session": "^1.15.6",
     "hbs": "^4.0.3",
+    "lodash": "^4.17.11",
     "memorystore": "^1.6.1",
     "mongoose": "^5.4.22",
     "mongoose-unique-validator": "^2.0.2",
